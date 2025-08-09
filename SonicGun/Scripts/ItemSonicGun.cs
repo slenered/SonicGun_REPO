@@ -399,15 +399,15 @@ public class ItemSonicGun : MonoBehaviour
 	}
 
 	public void Shoot() {
-		bool flag = itemBattery.batteryLifeInt <= 0;
-		if (Random.Range(0, 10000) == 0)
-		{
-			flag = false;
-		}
-		if (flag)
-		{
-			return;
-		}
+		// bool flag = itemBattery.batteryLifeInt <= 0;
+		// if (Random.Range(0, 10000) == 0)
+		// {
+		// 	flag = false;
+		// }
+		// if (flag)
+		// {
+		// 	return;
+		// }
 		if (hasOneShot)
 		{
 			if (SemiFunc.IsMultiplayer())

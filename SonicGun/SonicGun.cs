@@ -107,15 +107,15 @@ public class SonicGun : BaseUnityPlugin {
 				// print("VqNoItJ: " + value);
 			}
 
-			audio.volume = __instance.VolumeCurve.Evaluate(fields.tinnitusVolume); //fields.tinnitusVolume;
+			audio.volume = fields.tinnitusVolume*0.5f; //fields.tinnitusVolume;
 
 			// __instance.PersistentSoundGroup.audioMixer.GetFloat("PersistentVolume", out var value);
 			// print(value);
 
-			float MusicVol = Mathf.Lerp(-80f, 0f, __instance.VolumeCurve.Evaluate( (float)(DataDirector.instance.SettingValueFetch(DataDirector.Setting.MusicVolume) * 0.01f) * (1 - fields.tinnitusVolume)));
-			float SfxVol = Mathf.Lerp(-80f, 0f, __instance.VolumeCurve.Evaluate((float)(DataDirector.instance.SettingValueFetch(DataDirector.Setting.SfxVolume) * 0.01f) * (1 - fields.tinnitusVolume)));
-			float VoiceVol = Mathf.Lerp(-80f, 0f, __instance.VolumeCurve.Evaluate((float)(DataDirector.instance.SettingValueFetch(DataDirector.Setting.ProximityVoice) * 0.01f) * (1 - fields.tinnitusVolume)));
-			float TTSVol = Mathf.Lerp(-80f, 0f, __instance.VolumeCurve.Evaluate((float)(DataDirector.instance.SettingValueFetch(DataDirector.Setting.TextToSpeechVolume) * 0.01f) * (1 - fields.tinnitusVolume)));
+			float MusicVol = Mathf.Lerp(-80f, 0f, __instance.VolumeCurve.Evaluate( (float)(DataDirector.instance.SettingValueFetch(DataDirector.Setting.MusicVolume) * 0.01f) * (1.2f - fields.tinnitusVolume)));
+			float SfxVol = Mathf.Lerp(-80f, 0f, __instance.VolumeCurve.Evaluate((float)(DataDirector.instance.SettingValueFetch(DataDirector.Setting.SfxVolume) * 0.01f) * (1.2f - fields.tinnitusVolume)));
+			float VoiceVol = Mathf.Lerp(-80f, 0f, __instance.VolumeCurve.Evaluate((float)(DataDirector.instance.SettingValueFetch(DataDirector.Setting.ProximityVoice) * 0.01f) * (1.2f - fields.tinnitusVolume)));
+			float TTSVol = Mathf.Lerp(-80f, 0f, __instance.VolumeCurve.Evaluate((float)(DataDirector.instance.SettingValueFetch(DataDirector.Setting.TextToSpeechVolume) * 0.01f) * (1.2f - fields.tinnitusVolume)));
 			
 			__instance.MusicMasterGroup.audioMixer.SetFloat("MusicVolume", MusicVol);
 			__instance.SoundMasterGroup.audioMixer.SetFloat("SoundVolume", SfxVol);
@@ -136,6 +136,7 @@ public class SonicGun : BaseUnityPlugin {
 			if (PlayerController.instance.playerAvatarScript.RoomVolumeCheck.CurrentRooms.Count > 0) {
 				ReverbPreset reverbPreset = ScriptableObject.CreateInstance<ReverbPreset>();
 				ReverbPreset roomReverbPreset = PlayerController.instance.playerAvatarScript.RoomVolumeCheck.CurrentRooms[0].ReverbPreset;
+				
 				reverbPreset.dryLevel = Mathf.Lerp(roomReverbPreset.dryLevel, 0f, fields.tinnitusVolume);
 				reverbPreset.room = Mathf.Lerp(roomReverbPreset.room, -100f, fields.tinnitusVolume);
 				reverbPreset.roomHF = Mathf.Lerp(roomReverbPreset.roomHF, -1000f, fields.tinnitusVolume);
