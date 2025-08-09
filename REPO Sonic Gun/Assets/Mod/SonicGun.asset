@@ -16,7 +16,7 @@ MonoBehaviour:
   _author: slenered
   _version: 1.0.0
   _description: Adds a weapon to create sound remotely.
-  _websiteUrl: 
+  _websiteUrl: https://github.com/slenered/SonicGun_REPO.git
   _dependencies:
   - Zehs-REPOLib-2.1.0
   _icon: {fileID: 21300000, guid: 8aeb61e661a92a03fac77d5e4887a712, type: 3}

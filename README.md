@@ -13,7 +13,7 @@
 ## Overclock Ready!
 **By holding the trigger down you will charge the device to fire repeated sonic blasts!**\
 **Warning:** Holding the trigger down for too long will overload the device.\
-An overloaded device may:\
+An overloaded device may:
 * Emit a hypersonic blast.
 * Cause deafness.
 
