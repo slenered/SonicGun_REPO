@@ -1,0 +1,43 @@
+bin/
+obj/
+/packages/
+riderModule.iml
+/_ReSharper.Caches/
+/REPO Sonic Gun/REPO/
+/REPO Sonic Gun/AssetRipper/
+/REPO Sonic Gun/Library/
+/REPO Sonic Gun/Logs/
+/REPO Sonic Gun/Model Output/
+/REPO Sonic Gun/Mod/
+/REPO Sonic Gun/ProjectSettings/
+/REPO Sonic Gun/Packages/
+/REPO Sonic Gun/AssetRipperOutput/
+/REPO Sonic Gun/test/
+/REPO Sonic Gun/.gitignore
+/REPO Sonic Gun/mono_crash.mem.405903.1.blob
+/REPO Sonic Gun/steps-results.json
+/SonicGun.sln.DotSettings.user
+/SonicGun/Scripts/ItemToggle.cs-
+/REPO Sonic Gun/Assets/AssetStore/
+/REPO Sonic Gun/Assets/Materials/
+/REPO Sonic Gun/Assets/REPO/
+/REPO Sonic Gun/Assets/Unity/
+/REPO Sonic Gun/Assets/TextMesh Pro/
+/REPO Sonic Gun/Assets/TextMesh Pro.meta
+/REPO Sonic Gun/Assets/README.md.meta
+/REPO Sonic Gun/Assets/REPO.meta
+/REPO Sonic Gun/Assets/ModExportSettingsSource.asset.meta
+/REPO Sonic Gun/Assets/BepInExUserSettings.asset
+/REPO Sonic Gun/Assets/REPOLib.dll.meta
+/REPO Sonic Gun/Assets/REPOLib.dll
+/REPO Sonic Gun/Assets/UPPatcherUserSettings.asset.meta
+/REPO Sonic Gun/Assets/AssetStore.meta
+/REPO Sonic Gun/Assets/sonicgun.unity
+/REPO Sonic Gun/Assets/BepInExUserSettings.asset.meta
+/REPO Sonic Gun/Assets/Materials.meta
+/REPO Sonic Gun/Assets/UPPatcherUserSettings.asset
+/REPO Sonic Gun/Assets/README.md
+/REPO Sonic Gun/Assets/ModExportSettingsSource.asset
+/REPO Sonic Gun/Assets/sonicgun.unity.meta
+/REPO Sonic Gun/Assets/Unity.meta
+/.idea/
