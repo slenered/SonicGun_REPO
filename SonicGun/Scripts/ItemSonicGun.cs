@@ -305,17 +305,7 @@ public class ItemSonicGun : MonoBehaviour
 
 		if (Charges < MaxCharges || Overheated) {
 			stateCharge += Time.deltaTime;
-			if (stateCharge >= RechargeTime && Charges < MaxCharges) {
-				stateCharge -= RechargeTime;
-				Charges += 1;
-			} else if (Overheated && Charges >= MaxCharges && stateCharge >= RechargeTime * 2) {
-				stateCharge = 0;
-				Overheated = false;
-				// Charges = MaxCharges;
-			}
-			
-			// bool flag = RechargeTimeFlash > stateCharge % (RechargeTimeFlash * 2);
-			// ChargeBorder.color = flag ? Color.red : Color.white;
+			RestoreCharges(stateCharge);
 		}
 		
 		
@@ -390,84 +380,60 @@ public class ItemSonicGun : MonoBehaviour
 		}
 	}
 
-	public void Misfire()
-	{
-		if (!roomVolumeCheck.inTruck && !physGrabObject.grabbed && !physGrabObject.hasNeverBeenGrabbed && SemiFunc.IsMasterClientOrSingleplayer() && (float)Random.Range(0, 100) < misfirePercentageChange)
-		{
+	public void Misfire() {
+		if (!roomVolumeCheck.inTruck && !physGrabObject.grabbed && !physGrabObject.hasNeverBeenGrabbed && SemiFunc.IsMasterClientOrSingleplayer() && (float)Random.Range(0, 100) < misfirePercentageChange) {
 			Shoot();
 		}
 	}
 
 	public void Shoot() {
-		// bool flag = itemBattery.batteryLifeInt <= 0;
-		// if (Random.Range(0, 10000) == 0)
-		// {
-		// 	flag = false;
-		// }
-		// if (flag)
-		// {
-		// 	return;
-		// }
-		if (hasOneShot)
-		{
-			if (SemiFunc.IsMultiplayer())
-			{
-				photonView.RPC("ShootRPC", RpcTarget.All);
-			}
-			else
-			{
-				ShootRPC();
+		if (hasOneShot) {
+			if (SemiFunc.IsMultiplayer()) {
+				photonView.RPC("SonicShootRPC", RpcTarget.All);
+			} else {
+				SonicShootRPC();
 			}
 			StateSet(State.Reloading);
-
-			// if (charge <= 1 || charge == FinalCharge + 1) {
-			// 	StateSet(State.Reloading);
-			// 	// print("this reloading");
-			// 	charge = 0;
-			// } else if (charge <= 1 && stateTimer >= stateTimeMax) {
-			// 	Shoot();
-			// 	// print("FIRE! 2");
-			// 	Charges = Math.Max(0, Charges-1);
-			// 	charge -= 1;
-			// }
-			// stateCharge = 0;
-		}
-		else if (hasBuildUp)
-		{
+		} else if (hasBuildUp) {
 			StateSet(State.Buildup);
-		}
-		else
-		{
-			if (SemiFunc.IsMultiplayer()) {
-         			photonView.RPC("ShootRPC", RpcTarget.All);
-	        }
-	        else
-	        {
-         		ShootRPC();
-	        }
+		} else {
+			// if (SemiFunc.IsMultiplayer()) {
+   //       		photonView.RPC("SonicShootRPC", RpcTarget.All);
+	  //       }
+	  //       else
+	  //       {
+   //       		SonicShootRPC();
+	  //       }
 			StateSet(State.Shooting);
 		}
 	}
 
-	private void MuzzleFlash()
-	{
+	private void MuzzleFlash() {
 		Object.Instantiate(muzzleFlashPrefab, gunMuzzle.position, gunMuzzle.rotation, gunMuzzle).GetComponent<ItemGunMuzzleFlash>().ActivateAllEffects();
 	}
 
-	private void StartTriggerAnimation()
-	{
+	private void StartTriggerAnimation() {
 		triggerAnimationActive = true;
 		triggerAnimationEval = 0f;
 	}
 
 	[PunRPC]
-	public void ShootRPC(PhotonMessageInfo _info = default(PhotonMessageInfo))
-	{
-		if (!SemiFunc.MasterOnlyRPC(_info))
-		{
+	public void SonicShootRPC(PhotonMessageInfo _info = default(PhotonMessageInfo)) {
+		
+		if (!SemiFunc.MasterOnlyRPC(_info)) {
 			return;
 		}
+		bool hypersonic = charge > FinalCharge && itemBattery.batteryLifeInt > 0;
 		stateCharge = 0f;
+		if (hypersonic) {
+			Charges = 0;
+			charge = 0;
+		}
+		else {
+			Charges = Math.Max(0, Charges-1);
+			charge = Math.Max(0, charge-1);
+		}
+		
 		float distanceMin = 3f * cameraShakeMultiplier;
 		float distanceMax = 16f * cameraShakeMultiplier;
 		SemiFunc.CameraShakeImpactDistance(gunMuzzle.position, 5f * cameraShakeMultiplier, 0.1f, distanceMin, distanceMax);
@@ -476,72 +442,53 @@ public class ItemSonicGun : MonoBehaviour
 		soundShootGlobal.Play(gunMuzzle.position);
 		MuzzleFlash();
 		StartTriggerAnimation();
-		if (!SemiFunc.IsMasterClientOrSingleplayer())
-		{
+		if (!SemiFunc.IsMasterClientOrSingleplayer()) {
 			return;
 		}
-		if (investigateRadius > 0f)
-		{
+		if (investigateRadius > 0f) {
 			EnemyDirector.instance.SetInvestigate(base.transform.position, investigateRadius);
 		}
 		physGrabObject.rb.AddForceAtPosition(-gunMuzzle.forward * gunRecoilForce, gunMuzzle.position, ForceMode.Impulse);
-		if (!batteryDrainFullBar)
-		{
-			itemBattery.batteryLife -= batteryDrain;
+		itemHold = false;
+		itemHeld = false;
+		if (hypersonic) {
+			itemBattery.RemoveFullBar(1);
 		}
-		else
-		{
-			itemBattery.RemoveFullBar(batteryDrainFullBars);
+		Vector3 endPosition = gunMuzzle.position;
+		bool hit = false;
+		bool flag = false;
+		Vector3 vector = gunMuzzle.forward;
+		if (gunRandomSpread > 0f) {
+			float angle = Random.Range(0f, gunRandomSpread / 2f);
+			float angle2 = Random.Range(0f, 360f);
+			Vector3 normalized = Vector3.Cross(vector, Random.onUnitSphere).normalized;
+			Quaternion quaternion = Quaternion.AngleAxis(angle, normalized);
+			vector = (Quaternion.AngleAxis(angle2, vector) * quaternion * vector).normalized;
 		}
-		for (int i = 0; i < numberOfBullets; i++)
-		{
-			Vector3 endPosition = gunMuzzle.position;
-			bool hit = false;
-			bool flag = false;
-			Vector3 vector = gunMuzzle.forward;
-			if (gunRandomSpread > 0f)
-			{
-				float angle = Random.Range(0f, gunRandomSpread / 2f);
-				float angle2 = Random.Range(0f, 360f);
-				Vector3 normalized = Vector3.Cross(vector, Random.onUnitSphere).normalized;
-				Quaternion quaternion = Quaternion.AngleAxis(angle, normalized);
-				vector = (Quaternion.AngleAxis(angle2, vector) * quaternion * vector).normalized;
-			}
-			if (Physics.Raycast(gunMuzzle.position, vector, out var hitInfo, gunRange, (int)SemiFunc.LayerMaskGetVisionObstruct() + LayerMask.GetMask("Enemy")))
-			{
-				endPosition = hitInfo.point;
-				hit = true;
-			}
-			else
-			{
-				flag = true;
-			}
-			if (flag)
-			{
-				endPosition = gunMuzzle.position + gunMuzzle.forward * gunRange;
-				hit = true;
-			}
-			ShootBullet(endPosition, hit);
-		}
+		if (Physics.Raycast(gunMuzzle.position, vector, out var hitInfo, gunRange, (int)SemiFunc.LayerMaskGetVisionObstruct() + LayerMask.GetMask("Enemy"))) {
+			endPosition = hitInfo.point;
+			hit = true;
+		} else {
+			flag = true;
+		} if (flag) {
+			endPosition = gunMuzzle.position + gunMuzzle.forward * gunRange;
+			hit = true;
+		} 
+		ShootBullet(endPosition, hit, hypersonic);
 	}
 
-	private void ShootBullet(Vector3 _endPosition, bool _hit)
-	{
-		if (SemiFunc.IsMasterClientOrSingleplayer())
-		{
-			if (SemiFunc.IsMultiplayer())
-			{
-				photonView.RPC("ShootBulletRPC", RpcTarget.All, _endPosition, _hit);
-			}
-			else
-			{
-				ShootBulletRPC(_endPosition, _hit);
+	private void ShootBullet(Vector3 _endPosition, bool _hit, bool hypersonic) {
+		if (SemiFunc.IsMasterClientOrSingleplayer()) {
+			if (SemiFunc.IsMultiplayer()) {
+				photonView.RPC("SonicShootBulletRPC", RpcTarget.All, _endPosition, _hit, hypersonic);
+			} else {
+				SonicShootBulletRPC(_endPosition, _hit, hypersonic);
 			}
 		}
 	}
 
 	[PunRPC]
-	public void ShootBulletRPC(Vector3 _endPosition, bool _hit, PhotonMessageInfo _info = default(PhotonMessageInfo))
+	public void SonicShootBulletRPC(Vector3 _endPosition, bool _hit, bool hypersonic, PhotonMessageInfo _info = default(PhotonMessageInfo))
 	{
 		if (!SemiFunc.MasterOnlyRPC(_info))
 		{
@@ -558,7 +505,7 @@ public class ItemSonicGun : MonoBehaviour
 		// print(component.ToString());
 		component.hitPosition = _endPosition;
 		component.bulletHit = _hit;
-		component.hypersonic = charge > FinalCharge && itemBattery.batteryLifeInt > 0;
+		component.hypersonic = hypersonic;
 		SonicCollider = component.GetComponentInChildren<SonicCollider>();
 		soundHit.Play(_endPosition);
 		component.shootLineWidthCurve = shootLineWidthCurve;
@@ -575,12 +522,12 @@ public class ItemSonicGun : MonoBehaviour
 		{
 			if (SemiFunc.IsMasterClient())
 			{
-				photonView.RPC("StateSetRPC", RpcTarget.All, (int)_state);
+				photonView.RPC("SonicStateSetRPC", RpcTarget.All, (int)_state);
 			}
 		}
 		else
 		{
-			StateSetRPC((int)_state);
+			SonicStateSetRPC((int)_state);
 		}
 	}
 
@@ -593,86 +540,168 @@ public class ItemSonicGun : MonoBehaviour
 	
 	private void ShootLogic() {
 		// print(Overheated+ " , " + Charges);
-		itemHold = SemiFunc.InputHold(InputKey.Interact);
+		if (physGrabObject.heldByLocalPlayer) {
+			bool inputHold = SemiFunc.InputHold(InputKey.Interact);
+			if (SemiFunc.IsMultiplayer()) {
+				photonView.RPC("InputHoldRPC", RpcTarget.All, inputHold);
+			} else {
+				InputHoldRPC(inputHold);
+			}
+		} else if (physGrabObject.playerGrabbing.Count == 0) {
+			itemHeld = false;
+			itemHold =  false;
+		}
+		
 		if (Overheated || Charges <= 0) {
 			itemHeld = itemHold;
 			return;
-		} 
-		if (SemiFunc.IsMasterClientOrSingleplayer() && itemHold != itemHeld) {
-			if (itemBattery.batteryLifeInt <= 0 && charge >= FinalCharge+1)
-			{
-				soundNoAmmoClick.Play(base.transform.position);
-				StartTriggerAnimation();
-				SemiFunc.CameraShakeImpact(1f, 0.1f);
-				physGrabObject.rb.AddForceAtPosition(-gunMuzzle.forward * 1f, gunMuzzle.position, ForceMode.Impulse);
-			}
-			else if (!itemHold && itemHeld)
-			{
-				ChargeSound.PlayLoop(false, 1f, 1f);
-				ChargeSound.Source.volume = 0;
-				Shoot();
-				stateCharge = 0;
-				Charges = Math.Max(0, Charges-1);
-				// charge = 0;
-			}
-			
-			// prevToggleState = itemToggle.toggleState; Time.deltaTime
-		} else if (itemHold) {
-			var totalCharge = ChargeUpTime * FinalCharge + FinalChargeUpTime;
-			var percCharged = (ChargeUpTime * charge + stateCharge) / totalCharge;
-			stateCharge += Time.deltaTime;
-			ChargeSound.PlayLoop(true, 1f, 1f);
-			// ChargeSound.Play(base.transform.position);
-			ChargeSound.Source.volume = percCharged * 2;
-			physGrabObject.rb.AddForceAtPosition(Random.insideUnitSphere * (percCharged * 0.25f), physGrabObject.rb.position + Random.insideUnitSphere * 0.05f, ForceMode.Impulse);
-			
-			if (stateCharge >= ChargeUpTime && charge < FinalCharge && Charges > charge) {
-				stateCharge -= ChargeUpTime;
-				charge += 1;
-				if (charge >= FinalCharge) {
-					OverChargeSound.Play(base.transform.position);
-				}
-			} else if (stateCharge >= FinalChargeUpTime && charge == FinalCharge) {
-				stateCharge = 0;
-				charge += 1;
-			} else if (charge > FinalCharge) {
-				ChargeSound.PlayLoop(false, 1f, 1f);
-				ChargeSound.Source.volume = 0;
-				Shoot();
-				if (itemBattery.batteryLifeInt > 0) {
-					Charges = 0;
-					itemBattery.RemoveFullBar(1);
-				}
-				stateCharge = 0;
-				Overheated = true;
-			}
-			// ChargeBar1.color = Color.red; // #767676
 		}
+		if (SemiFunc.IsMasterClientOrSingleplayer()) {
+			if (itemHold != itemHeld) {
+				// if (itemBattery.batteryLifeInt <= 0 && charge >= FinalCharge+1)
+				// {
+				// 	soundNoAmmoClick.Play(base.transform.position);
+				// 	StartTriggerAnimation();
+				// 	SemiFunc.CameraShakeImpact(1f, 0.1f);
+				// 	physGrabObject.rb.AddForceAtPosition(-gunMuzzle.forward * 1f, gunMuzzle.position, ForceMode.Impulse);
+				// }
+				// else 
+				if (!itemHold && itemHeld) {
+					ChargeSound.PlayLoop(false, 1f, 1f);
+					ChargeSound.Source.volume = 0;
+					Shoot();
+					// stateCharge = 0;
+					// Charges = Math.Max(0, Charges-1);
+					// charge = 0;
+				}
+			} else if (itemHold) {
+				var totalCharge = ChargeUpTime * FinalCharge + FinalChargeUpTime;
+				var percCharged = (ChargeUpTime * charge + stateCharge) / totalCharge;
+				stateCharge += Time.deltaTime;
+				ChargeSound.PlayLoop(true, 1f, 1f);
+				// ChargeSound.Play(base.transform.position);
+				ChargeSound.Source.volume = percCharged * 2;
+				
+				// physGrabObject.rb.AddForceAtPosition(Random.insideUnitSphere * (percCharged * 0.25f), physGrabObject.rb.position + Random.insideUnitSphere * 0.05f, ForceMode.Impulse);
+				if (SemiFunc.IsMultiplayer()) {
+					photonView.RPC("SonicStateRPC", RpcTarget.All, stateCharge);
+				} else {
+					SonicStateRPC(stateCharge);
+				}
+			
+				if (stateCharge >= ChargeUpTime && charge < FinalCharge && Charges > charge) {
+					stateCharge -= ChargeUpTime;
+					// charge += 1;
+					Changecharge(1);
+					if (charge >= FinalCharge) {
+						OverChargeSound.Play(base.transform.position);
+					}
+				} else if (stateCharge >= FinalChargeUpTime && charge == FinalCharge) {
+					stateCharge = 0;
+					// charge += 1;
+					Changecharge(1);
+				} else if (charge > FinalCharge) {
+					ChargeSound.PlayLoop(false, 1f, 1f);
+					ChargeSound.Source.volume = 0;
+					Shoot();
+					stateCharge = 0;
+					SetOverheat(true);
+				}
+				// ChargeBar1.color = Color.red; // #767676
+			}
+			// prevToggleState = itemToggle.toggleState; Time.deltaTime
+		}
+
 		itemHeld = itemHold;
 	}
 	
 	
 	
-	
-	
-	
-	
 
 	[PunRPC]
-	private void StateSetRPC(int state, PhotonMessageInfo _info = default(PhotonMessageInfo))
-	{
-		if (SemiFunc.MasterOnlyRPC(_info))
-		{
+	private void InputHoldRPC(bool inputHold, PhotonMessageInfo _info = default(PhotonMessageInfo)) {
+		itemHold =  inputHold;
+	}
+	
+	[PunRPC]
+	private void SonicStateRPC(float stateCh, PhotonMessageInfo _info = default(PhotonMessageInfo)) {
+		stateCharge = stateCh;
+		var totalCharge = ChargeUpTime * FinalCharge + FinalChargeUpTime;
+		var percCharged = (ChargeUpTime * charge + stateCh) / totalCharge;
+		
+		physGrabObject.rb.AddForceAtPosition(Random.insideUnitSphere * (percCharged * 0.25f), physGrabObject.rb.position + Random.insideUnitSphere * 0.05f, ForceMode.Impulse);
+	}
+
+	
+	private void Changecharge(int c) {
+		if (SemiFunc.IsMultiplayer()) {
+			photonView.RPC("ChangechargeRPC", RpcTarget.All, c);
+		} else {
+			ChangechargeRPC(c);
+		}
+	}
+
+	[PunRPC]
+	private void ChangechargeRPC(int c, PhotonMessageInfo _info = default(PhotonMessageInfo)) {
+		charge = Math.Max(0, charge+c);
+	}
+
+	private void ChangeCharges(int c) {
+		if (SemiFunc.IsMultiplayer()) {
+			photonView.RPC("ChangeChargesRPC", RpcTarget.All, c);
+		} else {
+			ChangeChargesRPC(c);
+		}
+	}
+	[PunRPC]
+	private void ChangeChargesRPC(int c, PhotonMessageInfo _info = default(PhotonMessageInfo)) {
+		Charges = Math.Max(0, Charges+c);
+	}
+	
+	
+	private void RestoreCharges(float c) {
+		if (SemiFunc.IsMultiplayer()) {
+			photonView.RPC("RestoreChargesRPC", RpcTarget.All, c);
+		} else {
+			RestoreChargesRPC(c);
+		}
+	}
+	[PunRPC]
+	private void RestoreChargesRPC(float c, PhotonMessageInfo _info = default(PhotonMessageInfo)) {
+		if (stateCharge >= RechargeTime && Charges < MaxCharges) {
+			stateCharge -= RechargeTime;
+			Charges += 1;
+		} else if (Overheated && Charges >= MaxCharges && stateCharge >= RechargeTime * 2) {
+			stateCharge = 0;
+			Overheated = false;
+		}
+	}
+	
+	private void SetOverheat(bool c) {
+		if (SemiFunc.IsMultiplayer()) {
+			photonView.RPC("SetOverheatRPC", RpcTarget.All, c);
+		} else {
+			SetOverheatRPC(c);
+		}
+	}
+	[PunRPC]
+	private void SetOverheatRPC(bool c, PhotonMessageInfo _info = default(PhotonMessageInfo)) {
+		Overheated = c;
+	}
+	
+	
+	
+	[PunRPC]
+	private void SonicStateSetRPC(int state, PhotonMessageInfo _info = default(PhotonMessageInfo)) {
+		if (SemiFunc.MasterOnlyRPC(_info)) {
 			stateStart = true;
 			statePrev = stateCurrent;
 			stateCurrent = (State)state;
 		}
 	}
 
-	private void StateMachine(bool _fixedUpdate)
-	{
-		switch (stateCurrent)
-		{
+	private void StateMachine(bool _fixedUpdate) {
+		switch (stateCurrent) {
 			case State.Idle:
 				StateIdle(_fixedUpdate);
 				break;
@@ -700,7 +729,6 @@ public class ItemSonicGun : MonoBehaviour
 				onStateIdleStart.Invoke();
 			}
 			stateStart = false;
-			// prevToggleState = itemToggle.toggleState;
 		}
 		if (!_fixedUpdate)
 		{
@@ -780,12 +808,8 @@ public class ItemSonicGun : MonoBehaviour
 		}
 	}
 
-	private void StateShooting(bool _fixedUpdate)
-	{
-		if (stateStart && !_fixedUpdate)
-		{
-			// stateTimer = 0f;
-			// stateTimeMax = shootCooldown;
+	private void StateShooting(bool _fixedUpdate) {
+		if (stateStart && !_fixedUpdate) {
 			stateStart = false;
 			if (onStateShootingStart != null)
 			{
@@ -794,69 +818,32 @@ public class ItemSonicGun : MonoBehaviour
 			if (!hasOneShot)
 			{
 				stateTimeMax = shootTime;
-				stateTimer = 0f;
+				stateTimer = stateTimeMax;
 				investigateCooldown = 0f;
 			}
 			else
 			{
 				stateTimer = 0.001f;
 			}
-			// if (itemBattery.batteryLifeInt > 0)
-			// {
-			// 	itemBattery.RemoveFullBar(1);
-			// }
 		}
-		if (!_fixedUpdate)
-		{
-			if (investigateRadius > 0f)
-			{
-				if (investigateCooldown <= 0f)
-				{
-					EnemyDirector.instance.SetInvestigate(base.transform.position, investigateRadius);
-					investigateCooldown = 0.5f;
-				}
-				else
-				{
-					investigateCooldown -= Time.deltaTime;
-				}
-			}
+		if (!_fixedUpdate) {
 			stateTimer += Time.deltaTime;
-			// print("Shooting , "+ charge + " , " + (stateTimer >= stateTimeMax));
-			stateCharge = 0f;
+			// stateCharge = 0f;
 			
-			if (charge > 1 && stateTimer >= stateTimeMax) {
-				// print("CHARGE!");
-				// Shoot();
-				Charges = Math.Max(0, Charges-1);
-				charge -= 1;
-				stateCharge = 0f;
-				
+			if (stateTimer >= stateTimeMax) {
+				// stateStart = true;
+				stateTimer = 0f;
 				if (SemiFunc.IsMultiplayer()) {
-					photonView.RPC("ShootRPC", RpcTarget.All);
+					photonView.RPC("SonicShootRPC", RpcTarget.All);
 				}
 				else
 				{
-					ShootRPC();
+					SonicShootRPC();
 				}
-
-				stateTimer = 0f;
-			} else if (charge is <= 1 or 4)
-			{
-				charge = 0;
-				stateCharge = 0f;
-				// print("reload , " + charge);
 				
-				StateSet(State.Reloading);
-			}
-			// if (hasShootingUpdate)
-			// {
-			// 	onStateShootingUpdate.Invoke();
-			// }
-			
-		}
-		if (_fixedUpdate && hasShootingFixedUpdate)
-		{
-			onStateShootingFixedUpdate.Invoke();
+				if (charge <= 0) 
+					StateSet(State.Reloading);
+			} 
 		}
 	}
 

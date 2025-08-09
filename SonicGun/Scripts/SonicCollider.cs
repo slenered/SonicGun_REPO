@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using ExitGames.Client.Photon;
 using Photon.Pun;
 using SonicGun;
 using UnityEngine;
@@ -585,6 +586,14 @@ public class SonicCollider : MonoBehaviour
 		HasTimerLogic();
 	}
 
+	private void tinnitus(PlayerAvatar _player) {
+		if (SemiFunc.IsMultiplayer()) {
+			SonicGun.SonicGun.tinnitusEvent.RaiseEvent(_player.photonView.ViewID, REPOLib.Modules.NetworkingEvents.RaiseAll, SendOptions.SendReliable);
+		} else {
+			ValueStorage.tinnitusVolume = 1f;
+		}
+	}
+	
 	private void PlayerHurt(PlayerAvatar _player)
 	{
 		if (ignoreLocalPlayer && _player.isLocal)
@@ -598,8 +607,11 @@ public class SonicCollider : MonoBehaviour
 				return;
 			}
 			
-			var fields = ValueStorage.GetOrCreate(_player);
-			fields.tinnitusVolume = 1f;
+			
+			// print(_player);
+			tinnitus(_player);
+			// var fields = ValueStorage.GetOrCreate(_player);
+			// fields.tinnitusVolume = 1f;
 			// print(_player.playerName);
 			
 			int enemyIndex = SemiFunc.EnemyGetIndex(enemyHost);
@@ -683,6 +695,8 @@ public class SonicCollider : MonoBehaviour
 			}
 		}
 	}
+	
+	
 
 	private bool PhysObjectHurt(PhysGrabObject physGrabObject, BreakImpact impact, float hitForce, float hitTorque, bool apply, bool destroyLaunch, Enemy enemy = null)
 	{

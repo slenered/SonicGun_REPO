@@ -26106,7 +26106,7 @@ MonoBehaviour:
     Sounds:
     - {fileID: 8300000, guid: 369fb6172d6be9d05b326c6c28bb92d1, type: 3}
     - {fileID: 8300000, guid: c4f0d88b4fcf0870fb15649f44574150, type: 3}
-    Type: 0
+    Type: 7
     Volume: 0.5
     VolumeRandom: 0.1
     Pitch: 1
@@ -26116,7 +26116,7 @@ MonoBehaviour:
     ReverbMix: 1
     FalloffMultiplier: 1
     OffscreenVolume: 1
-    OffscreenFalloff: 1
+    OffscreenFalloff: 0.101
     LowPassIgnoreColliders: []
   tinnitusSound: {fileID: 8300000, guid: a475a8c5440bb01f595b8b56284787f0, type: 3}
 --- !u!1 &1700246502672382538

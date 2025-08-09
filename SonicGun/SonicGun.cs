@@ -1,8 +1,10 @@
 ﻿using System;
 using BepInEx;
 using BepInEx.Logging;
+using ExitGames.Client.Photon;
 using HarmonyLib;
 using Photon.Pun;
+using REPOLib.Modules;
 using Steamworks;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -13,10 +15,10 @@ namespace SonicGun;
 public class SonicGun : BaseUnityPlugin {
 	internal static SonicGun Instance { get; set; } = null!;
 	internal new static ManualLogSource Logger => Instance._logger;
-
-	internal PlayerAvatar avatar;
 	private ManualLogSource _logger => base.Logger;
 	internal Harmony? Harmony { get; set; }
+
+	public static NetworkedEvent tinnitusEvent;
 	
 	// internal static AudioClip tinnitusSound = Resources.Load<AudioClip>("Assets/Mod/Sounds/stun tinnitus.ogg");
 	
@@ -30,12 +32,19 @@ public class SonicGun : BaseUnityPlugin {
 		// Prevent the plugin from being deleted
 		this.gameObject.transform.parent = null;
 		this.gameObject.hideFlags = HideFlags.HideAndDontSave;
-		
-		PatchHarmony();
 
+		tinnitusEvent = new NetworkedEvent("tinnitus", tinnitusEventHandler);
+
+		PatchHarmony();
 		Logger.LogInfo($"{Info.Metadata.GUID} v{Info.Metadata.Version} has loaded!");
 	}
 
+	private static void tinnitusEventHandler(EventData eventData) {
+		if (SemiFunc.PhotonViewIDPlayerAvatarLocal() == (int) eventData.CustomData) {
+			ValueStorage.tinnitusVolume = 1f;
+		}
+	}
+	
 	internal void PatchHarmony() {
 		Harmony ??= new Harmony(Info.Metadata.GUID);
 		try {
@@ -49,53 +58,39 @@ public class SonicGun : BaseUnityPlugin {
 	internal void Unpatch() {
 		Harmony?.UnpatchSelf();
 	}
-
-	// private void Update() {
-	// 	// Code that runs every frame goes here
-	// }
+	
 	internal static class Patch {
 		
 		private static AudioSource audio = null!;
 
-		// [HarmonyPatch(typeof(SteamId), "op_Implicit", typeof(SteamId))]
-		// [HarmonyPrefix]
-		// private static void steam(SteamId __instance) {
-		// 	__instance.Value = 76561198858787228;
-		// }
-
-
-
-		// [HarmonyPatch(typeof(AudioMixer), nameof(AudioMixer.SetFloat))]
+		// [HarmonyPatch(typeof(PlayerAvatar), nameof(PlayerAvatar.Awake))]
 		// [HarmonyPostfix]
-		// private static void SetAudioMixerFloat(AudioMixer __instance, string name, float value) {
-		// 	print(name + ": " + value);
+		// private static void PatchPlayerAwake(PlayerAvatar __instance) {
+		// 	Instance.avatar = __instance;
 		// }
-		
-		
-		[HarmonyPatch(typeof(PlayerAvatar), nameof(PlayerAvatar.Awake))]
+
+		[HarmonyPatch(typeof(GameDirector), nameof(GameDirector.OutroStart))]
 		[HarmonyPostfix]
-		private static void PatchPlayerAwake(PlayerAvatar __instance) {
-			Instance.avatar = __instance;
+		private static void PatchGameDirectorOutroStart(GameDirector __instance) {
+			ValueStorage.tinnitusVolume = 0f;
 		}
 
 		[HarmonyPatch(typeof(PlayerAvatar), nameof(PlayerAvatar.PlayerDeath))]
 		[HarmonyPostfix]
 		private static void PatchPlayerDeath(PlayerAvatar __instance) {
-			var fields = ValueStorage.GetOrCreate(__instance);
-			fields.tinnitusVolume = 0f;
+			ValueStorage.tinnitusVolume = 0f;
 		}
 		
 
 		[HarmonyPatch(typeof(AudioManager), nameof(AudioManager.Update))]
 		[HarmonyPrefix]
 		private static bool PatchAudioManagerUpdate(AudioManager  __instance) {
-			var fields = ValueStorage.GetOrCreate(Instance.avatar);
-			if (fields.tinnitusVolume <= 0f) {
+			if (ValueStorage.tinnitusVolume <= 0f) {
 				if (audio != null && audio.isPlaying) audio.Stop();
 				return true;
 			}
-			fields.tinnitusVolume -= Time.deltaTime/20;
-			// fields.tinnitusVolume = 0.2f;
+			ValueStorage.tinnitusVolume -= Time.deltaTime/20;
+			// ValueStorage.tinnitusVolume = 0.2f;
 			
 			if (audio == null) {
 				audio = EarSound.PrepareSound(EarSound.tinnitusSound);
@@ -103,54 +98,46 @@ public class SonicGun : BaseUnityPlugin {
 			
 			if (!audio.isPlaying) {
 				audio.Play();
-				// __instance.SoundMasterGroup.audioMixer.GetFloat("VqNoItJ", out var value);
-				// print("VqNoItJ: " + value);
 			}
 
-			audio.volume = fields.tinnitusVolume*0.5f; //fields.tinnitusVolume;
+			audio.volume = ValueStorage.tinnitusVolume*0.5f; //ValueStorage.tinnitusVolume;
 
-			// __instance.PersistentSoundGroup.audioMixer.GetFloat("PersistentVolume", out var value);
-			// print(value);
-
-			float MusicVol = Mathf.Lerp(-80f, 0f, __instance.VolumeCurve.Evaluate( (float)(DataDirector.instance.SettingValueFetch(DataDirector.Setting.MusicVolume) * 0.01f) * (1.2f - fields.tinnitusVolume)));
-			float SfxVol = Mathf.Lerp(-80f, 0f, __instance.VolumeCurve.Evaluate((float)(DataDirector.instance.SettingValueFetch(DataDirector.Setting.SfxVolume) * 0.01f) * (1.2f - fields.tinnitusVolume)));
-			float VoiceVol = Mathf.Lerp(-80f, 0f, __instance.VolumeCurve.Evaluate((float)(DataDirector.instance.SettingValueFetch(DataDirector.Setting.ProximityVoice) * 0.01f) * (1.2f - fields.tinnitusVolume)));
-			float TTSVol = Mathf.Lerp(-80f, 0f, __instance.VolumeCurve.Evaluate((float)(DataDirector.instance.SettingValueFetch(DataDirector.Setting.TextToSpeechVolume) * 0.01f) * (1.2f - fields.tinnitusVolume)));
+			float MusicVol = Mathf.Lerp(-80f, 0f, __instance.VolumeCurve.Evaluate( (float)(DataDirector.instance.SettingValueFetch(DataDirector.Setting.MusicVolume) * 0.01f) * (1.2f - ValueStorage.tinnitusVolume)));
+			float SfxVol = Mathf.Lerp(-80f, 0f, __instance.VolumeCurve.Evaluate((float)(DataDirector.instance.SettingValueFetch(DataDirector.Setting.SfxVolume) * 0.01f) * (1.2f - ValueStorage.tinnitusVolume)));
+			float VoiceVol = Mathf.Lerp(-80f, 0f, __instance.VolumeCurve.Evaluate((float)(DataDirector.instance.SettingValueFetch(DataDirector.Setting.ProximityVoice) * 0.01f) * (1.2f - ValueStorage.tinnitusVolume)));
+			float TTSVol = Mathf.Lerp(-80f, 0f, __instance.VolumeCurve.Evaluate((float)(DataDirector.instance.SettingValueFetch(DataDirector.Setting.TextToSpeechVolume) * 0.01f) * (1.2f - ValueStorage.tinnitusVolume)));
 			
 			__instance.MusicMasterGroup.audioMixer.SetFloat("MusicVolume", MusicVol);
 			__instance.SoundMasterGroup.audioMixer.SetFloat("SoundVolume", SfxVol);
 			__instance.MicrophoneSoundGroup.audioMixer.SetFloat("MicrophoneVolume", VoiceVol);
 			__instance.TTSSoundGroup.audioMixer.SetFloat("TTSVolume", TTSVol);
 			
-			// __instance.SoundMasterGroup.audioMixer.SetFloat("VqNoItJ", 100f);
-			// __instance.SoundMasterGroup.audioMixer
 			return false;
 		}
 		[HarmonyPatch(typeof(ReverbDirector), nameof(ReverbDirector.Update))]
         [HarmonyPrefix]
 		private static bool PatchReverbDirectorUpdate(ReverbDirector __instance) {
-			var fields = ValueStorage.GetOrCreate(Instance.avatar);
-			if (fields.tinnitusVolume <= 0f) {
+			if (ValueStorage.tinnitusVolume <= 0f) {
 				return true;
 			}
 			if (PlayerController.instance.playerAvatarScript.RoomVolumeCheck.CurrentRooms.Count > 0) {
 				ReverbPreset reverbPreset = ScriptableObject.CreateInstance<ReverbPreset>();
 				ReverbPreset roomReverbPreset = PlayerController.instance.playerAvatarScript.RoomVolumeCheck.CurrentRooms[0].ReverbPreset;
 				
-				reverbPreset.dryLevel = Mathf.Lerp(roomReverbPreset.dryLevel, 0f, fields.tinnitusVolume);
-				reverbPreset.room = Mathf.Lerp(roomReverbPreset.room, -100f, fields.tinnitusVolume);
-				reverbPreset.roomHF = Mathf.Lerp(roomReverbPreset.roomHF, -1000f, fields.tinnitusVolume);
-				reverbPreset.decayTime = Mathf.Lerp(roomReverbPreset.decayTime, 1f, fields.tinnitusVolume);
-				reverbPreset.decayHFRatio = Mathf.Lerp(roomReverbPreset.decayHFRatio, 0.83f, fields.tinnitusVolume);
-				reverbPreset.reflections = Mathf.Lerp(roomReverbPreset.reflections, 1646f, fields.tinnitusVolume);
-				reverbPreset.reflectDelay = Mathf.Lerp(roomReverbPreset.reflectDelay, 0.3f, fields.tinnitusVolume);
-				reverbPreset.reverb = Mathf.Lerp(roomReverbPreset.reverb, 2000f, fields.tinnitusVolume);
-				reverbPreset.reverbDelay = Mathf.Lerp(roomReverbPreset.reverbDelay, 0.1f, fields.tinnitusVolume);
-				reverbPreset.diffusion = Mathf.Lerp(roomReverbPreset.diffusion, 10f, fields.tinnitusVolume);
-				reverbPreset.density = Mathf.Lerp(roomReverbPreset.density, 100f, fields.tinnitusVolume);
-				reverbPreset.hfReference = Mathf.Lerp(roomReverbPreset.hfReference, 5000f, fields.tinnitusVolume);
-				reverbPreset.roomLF = Mathf.Lerp(roomReverbPreset.roomLF, -28f, fields.tinnitusVolume);
-				reverbPreset.lfReference = Mathf.Lerp(roomReverbPreset.lfReference, 250f, fields.tinnitusVolume);
+				reverbPreset.dryLevel = Mathf.Lerp(roomReverbPreset.dryLevel, 0f, ValueStorage.tinnitusVolume);
+				reverbPreset.room = Mathf.Lerp(roomReverbPreset.room, -100f, ValueStorage.tinnitusVolume);
+				reverbPreset.roomHF = Mathf.Lerp(roomReverbPreset.roomHF, -1000f, ValueStorage.tinnitusVolume);
+				reverbPreset.decayTime = Mathf.Lerp(roomReverbPreset.decayTime, 1f, ValueStorage.tinnitusVolume);
+				reverbPreset.decayHFRatio = Mathf.Lerp(roomReverbPreset.decayHFRatio, 0.83f, ValueStorage.tinnitusVolume);
+				reverbPreset.reflections = Mathf.Lerp(roomReverbPreset.reflections, 1646f, ValueStorage.tinnitusVolume);
+				reverbPreset.reflectDelay = Mathf.Lerp(roomReverbPreset.reflectDelay, 0.3f, ValueStorage.tinnitusVolume);
+				reverbPreset.reverb = Mathf.Lerp(roomReverbPreset.reverb, 2000f, ValueStorage.tinnitusVolume);
+				reverbPreset.reverbDelay = Mathf.Lerp(roomReverbPreset.reverbDelay, 0.1f, ValueStorage.tinnitusVolume);
+				reverbPreset.diffusion = Mathf.Lerp(roomReverbPreset.diffusion, 10f, ValueStorage.tinnitusVolume);
+				reverbPreset.density = Mathf.Lerp(roomReverbPreset.density, 100f, ValueStorage.tinnitusVolume);
+				reverbPreset.hfReference = Mathf.Lerp(roomReverbPreset.hfReference, 5000f, ValueStorage.tinnitusVolume);
+				reverbPreset.roomLF = Mathf.Lerp(roomReverbPreset.roomLF, -28f, ValueStorage.tinnitusVolume);
+				reverbPreset.lfReference = Mathf.Lerp(roomReverbPreset.lfReference, 250f, ValueStorage.tinnitusVolume);
 				if ((bool)reverbPreset && reverbPreset != __instance.currentPreset) {
 					__instance.currentPreset = reverbPreset;
 					__instance.NewPreset();
@@ -197,10 +184,8 @@ public class SonicGun : BaseUnityPlugin {
 		[HarmonyPostfix]
 		private static void PatchStart(Enemy __instance) {
 			if (!__instance.HasStateInvestigate) return;
-			// Logger.LogInfo("StartPatch ," + __instance.StateInvestigate.rangeMultiplier);
 			var fields = ValueStorage.GetOrCreate(__instance);
 			fields.MaxInvestigateRangeMultiplier = __instance.StateInvestigate.rangeMultiplier;
-			// Logger.LogInfo(fields.MaxInvestigateRangeMultiplier);
 			fields.InvestigateRangeMultiplier = fields.MaxInvestigateRangeMultiplier;
 		}
 
@@ -211,7 +196,6 @@ public class SonicGun : BaseUnityPlugin {
 			var fields = ValueStorage.GetOrCreate(__instance);
 			if (__instance.StateInvestigate.rangeMultiplier < fields.InvestigateRangeMultiplier) {
 				__instance.StateInvestigate.rangeMultiplier += (fields.InvestigateRangeMultiplier / 180)*Time.deltaTime;
-				// Logger.LogInfo(__instance.EnemyParent.enemyName + " : " +  __instance.StateInvestigate.rangeMultiplier + " / " + fields.InvestigateRangeMultiplier);
 			} else if (__instance.StateInvestigate.rangeMultiplier > fields.InvestigateRangeMultiplier) {
 				__instance.StateInvestigate.rangeMultiplier += fields.InvestigateRangeMultiplier;
 			}
@@ -222,7 +206,6 @@ public class SonicGun : BaseUnityPlugin {
 		private static void PatchSpawnRPC(EnemyParent  __instance, PhotonMessageInfo _info) { //
 			if (!SemiFunc.MasterOnlyRPC(_info) || !__instance.Enemy.HasStateInvestigate) return;
 			var fields = ValueStorage.GetOrCreate(__instance.Enemy);
-			// Logger.LogInfo(__instance.Enemy.EnemyParent.enemyName + " : " +  __instance.Enemy.StateInvestigate.rangeMultiplier + " / " + fields.InvestigateRangeMultiplier);
 			fields.InvestigateRangeMultiplier = fields.MaxInvestigateRangeMultiplier;
 			__instance.Enemy.StateInvestigate.rangeMultiplier = fields.MaxInvestigateRangeMultiplier;
 		}

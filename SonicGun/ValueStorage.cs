@@ -9,6 +9,7 @@ public static class ValueStorage {
 	private static readonly ConditionalWeakTable<MonoBehaviour, NewValues> Data =
 		new ConditionalWeakTable<MonoBehaviour, NewValues>();
 
+	public static float tinnitusVolume = 0f;
 	// public static Sound tinnitusSound = new Sound();
 	// public static AudioMixer SoundMixer;
 
