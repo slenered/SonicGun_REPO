@@ -20,4 +20,4 @@ An overloaded device may:\
 *As long as you don't overload the device
 
 ***
-If you discover any issues, please report them to the github repo.
+If you discover any issues, please report them to the [GitHub repo](https://github.com/slenered/SonicGun_REPO).
