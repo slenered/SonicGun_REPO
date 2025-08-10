@@ -575,8 +575,10 @@ public class SonicCollider : MonoBehaviour
 
 	private void tinnitus(PlayerAvatar _player) {
 		if (SemiFunc.IsMultiplayer()) {
+			print("Multiplayer");
 			SonicGun.SonicGun.tinnitusEvent.RaiseEvent(_player.photonView.ViewID, REPOLib.Modules.NetworkingEvents.RaiseAll, SendOptions.SendReliable);
 		} else {
+			print("singleplayer");
 			ValueStorage.tinnitusVolume = 1f;
 		}
 	}
