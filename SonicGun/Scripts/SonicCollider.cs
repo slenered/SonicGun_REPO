@@ -176,8 +176,7 @@ public class SonicCollider : MonoBehaviour
 
 	private Vector3 applyTorque;
 
-	private void Awake()
-	{
+	private void Awake() {
 		BoxCollider = GetComponent<BoxCollider>();
 		if (!BoxCollider)
 		{
@@ -301,46 +300,34 @@ public class SonicCollider : MonoBehaviour
 		return true;
 	}
 
-	private IEnumerator ColliderCheck()
-	{
+	private IEnumerator ColliderCheck() {
 		yield return null;
-		while (!LevelGenerator.Instance || !LevelGenerator.Instance.Generated)
-		{
+		while (!LevelGenerator.Instance || !LevelGenerator.Instance.Generated) {
 			yield return new WaitForSeconds(0.1f);
 		}
-		while (true)
-		{
+		while (true) {
 			Collider[] array;
-			if (ColliderIsBox)
-			{
+			if (ColliderIsBox) {
 				Vector3 center = base.transform.TransformPoint(BoxCollider.center);
 				Vector3 vector = new Vector3(base.transform.lossyScale.x * BoxCollider.size.x, base.transform.lossyScale.y * BoxCollider.size.y, base.transform.lossyScale.z * BoxCollider.size.z);
 				array = Physics.OverlapBox(center, vector * 0.5f, base.transform.rotation, LayerMask, QueryTriggerInteraction.Collide);
-			}
-			else
-			{
+			} else {
 				Vector3 center2 = Collider.bounds.center;
 				float radius = base.transform.lossyScale.x * SphereCollider.radius;
 				array = Physics.OverlapSphere(center2, radius, LayerMask, QueryTriggerInteraction.Collide);
 			}
-			if (array.Length != 0)
-			{
+			if (array.Length != 0) {
 				Collider[] array2 = array;
-				foreach (Collider collider in array2)
-				{
-					if (playerLogic && playerDamageCooldown > 0f && collider.gameObject.CompareTag("Player"))
-					{
+				foreach (Collider collider in array2) {
+					if (playerLogic && playerDamageCooldown > 0f && collider.gameObject.CompareTag("Player")) {
 						PlayerAvatar playerAvatar = collider.gameObject.GetComponentInParent<PlayerAvatar>();
-						if (!playerAvatar)
-						{
+						if (!playerAvatar) {
 							PlayerController componentInParent = collider.gameObject.GetComponentInParent<PlayerController>();
-							if ((bool)componentInParent)
-							{
+							if ((bool)componentInParent) {
 								playerAvatar = componentInParent.playerAvatarScript;
 							}
 						}
-						if ((bool)playerAvatar)
-						{
+						if ((bool)playerAvatar) {
 							PlayerHurt(playerAvatar);
 						}
 					}
@@ -594,25 +581,16 @@ public class SonicCollider : MonoBehaviour
 		}
 	}
 	
-	private void PlayerHurt(PlayerAvatar _player)
-	{
-		if (ignoreLocalPlayer && _player.isLocal)
-		{
+	private void PlayerHurt(PlayerAvatar _player) {
+		if (ignoreLocalPlayer && _player.isLocal) {
 			ignoreLocalPlayer = false;
-		}
-		else
-		{
+		} else {
 			if (GameManager.Multiplayer() && !_player.photonView.IsMine)
 			{
 				return;
 			}
 			
-			
-			// print(_player);
 			tinnitus(_player);
-			// var fields = ValueStorage.GetOrCreate(_player);
-			// fields.tinnitusVolume = 1f;
-			// print(_player.playerName);
 			
 			int enemyIndex = SemiFunc.EnemyGetIndex(enemyHost);
 			if (playerKill)

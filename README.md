@@ -1,5 +1,5 @@
 **Are you tired of Huntsmen listening in on your very philosophical conversations?**\
-**Have you ever wanted to pick up the spare change of the ground and toss it?**
+**Have you ever wanted to pick up the spare change off the ground and toss it?**
 ***
 # Introducing: The Sonic Gun!
 ***
