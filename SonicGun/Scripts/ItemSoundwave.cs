@@ -32,8 +32,7 @@ public class ItemSoundwave : MonoBehaviour
 	public AudioClip tinnitusSound;
 	// public AudioMixer SoundMixer;
 
-	private void Start()
-	{
+	private void Start() {
 		// Sound.CopySound(tinnitusSound, ValueStorage.tinnitusSound);
 		EarSound.tinnitusSound = this.tinnitusSound;
 		
@@ -44,11 +43,11 @@ public class ItemSoundwave : MonoBehaviour
 		_sonicCollider.gameObject.SetActive(value: hypersonic);
 		meshRenderer.material.color = Color.white;
 		base.transform.localScale = Vector3.zero;
-		if (!hypersonic) 
+		if (!hypersonic)
 			soundSonic.Play(base.transform.position);
 			// tinnitusSound.Play(base.transform.position);
 		else {
-			soundHypersonic.Play(base.transform.position, 0.5f);
+			soundHypersonic.Play(base.transform.position, 0.75f);
 			soundExplosionGlobal.Play(base.transform.position);
 		}
 		
