@@ -505,66 +505,6 @@ public class SonicCollider : MonoBehaviour
 				_enemy.Rigidbody.FreezeForces(applyForce, applyTorque);
 			}
 		}
-		
-		// GameObject EnemyController = _enemy.EnemyParent.EnableObject.transform.Find("Controller").gameObject;
-		// EnemyStateInvestigate EnemyInvestigate = EnemyController.GetComponent<EnemyStateInvestigate>();
-		// EnemyInvestigate.
-		
-		
-		// bool flag = false;
-		// if (deathPit)
-		// {
-		// 	if (SemiFunc.MoonLevel() < 2 || !_enemy.HasHealth)
-		// 	{
-		// 		enemyKill = true;
-		// 	}
-		// 	else
-		// 	{
-		// 		enemyKill = false;
-		// 		if (_enemy.Health.deathPitCooldown <= 0f)
-		// 		{
-		// 			int damage = 120;
-		// 			if (SemiFunc.MoonLevel() == 3)
-		// 			{
-		// 				damage = 80;
-		// 			}
-		// 			else if (SemiFunc.MoonLevel() >= 4)
-		// 			{
-		// 				damage = 40;
-		// 			}
-		// 			_enemy.Health.Hurt(damage, base.transform.forward);
-		// 			_enemy.Health.DeathPitCooldown();
-		// 			_enemy.StateStunned.Set(5f);
-		// 			if (_enemy.HasRigidbody)
-		// 			{
-		// 				PhysObjectHurt(_enemy.Rigidbody.physGrabObject, BreakImpact.Heavy, 0.1f, 0.1f, apply: false, destroyLaunch: true, _enemy);
-		// 				_enemy.Rigidbody.FreezeForces(applyForce * 10f, applyTorque * 10f);
-		// 				_enemy.Freeze(0.2f);
-		// 			}
-		// 		}
-		// 	}
-		// }
-		// if (enemyKill)
-		// {
-		// 	if (_enemy.HasHealth)
-		// 	{
-		// 		_enemy.Health.Hurt(_enemy.Health.healthCurrent, base.transform.forward);
-		// 	}
-		// 	else if (_enemy.HasStateDespawn)
-		// 	{
-		// 		_enemy.EnemyParent.SpawnedTimerSet(0f);
-		// 		_enemy.CurrentState = EnemyState.Despawn;
-		// 		flag = true;
-		// 	}
-		// }
-		// if (!flag && !deathPit)
-		// {
-		
-		// 	if (enemyDamage > 0 && _enemy.HasHealth)
-		// 	{
-		// 		_enemy.Health.Hurt(enemyDamage, applyForce.normalized);
-		// 	}
-		// }
 		return true;
 	}
 
@@ -576,7 +516,7 @@ public class SonicCollider : MonoBehaviour
 	private void tinnitus(PlayerAvatar _player) {
 		if (SemiFunc.IsMultiplayer()) {
 			print("Multiplayer");
-			SonicGun.SonicGun.tinnitusEvent.RaiseEvent(_player.photonView.ViewID, REPOLib.Modules.NetworkingEvents.RaiseAll, SendOptions.SendReliable);
+			SonicGun.SonicGun.TinnitusEvent.RaiseEvent(_player.photonView.ViewID, REPOLib.Modules.NetworkingEvents.RaiseAll, SendOptions.SendReliable);
 		} else {
 			print("singleplayer");
 			ValueStorage.tinnitusVolume = 1f;

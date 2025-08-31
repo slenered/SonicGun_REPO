@@ -11,35 +11,30 @@ using UnityEngine.Audio;
 
 namespace SonicGun;
 
-[BepInPlugin("slenered.SonicGun", "SonicGun", "1.0")]
+[BepInPlugin("slenered.SonicGun", "SonicGun", "1.0.3")]
+[BepInDependency(REPOLib.MyPluginInfo.PLUGIN_GUID, BepInDependency.DependencyFlags.HardDependency)]
 public class SonicGun : BaseUnityPlugin {
 	internal static SonicGun Instance { get; set; } = null!;
 	internal new static ManualLogSource Logger => Instance._logger;
 	private ManualLogSource _logger => base.Logger;
 	internal Harmony? Harmony { get; set; }
 
-	public static NetworkedEvent tinnitusEvent;
+	public static NetworkedEvent TinnitusEvent = null!;
 	
-	// internal static AudioClip tinnitusSound = Resources.Load<AudioClip>("Assets/Mod/Sounds/stun tinnitus.ogg");
-	
-
 	private void Awake() {
 		Instance = this;
 		
-		// tinnitusSound = new Sound();
-		// tinnitusSound.Sounds = new AudioClip[];
-
 		// Prevent the plugin from being deleted
 		this.gameObject.transform.parent = null;
 		this.gameObject.hideFlags = HideFlags.HideAndDontSave;
 
-		tinnitusEvent = new NetworkedEvent("tinnitus", tinnitusEventHandler);
+		TinnitusEvent = new NetworkedEvent("tinnitus", TinnitusEventHandler);
 
 		PatchHarmony();
 		Logger.LogInfo($"{Info.Metadata.GUID} v{Info.Metadata.Version} has loaded!");
 	}
 
-	private static void tinnitusEventHandler(EventData eventData) {
+	private static void TinnitusEventHandler(EventData eventData) {
 		if (SemiFunc.PhotonViewIDPlayerAvatarLocal() == (int) eventData.CustomData) {
 			ValueStorage.tinnitusVolume = 1f;
 		}
@@ -63,12 +58,6 @@ public class SonicGun : BaseUnityPlugin {
 		
 		private static AudioSource audio = null!;
 
-		// [HarmonyPatch(typeof(PlayerAvatar), nameof(PlayerAvatar.Awake))]
-		// [HarmonyPostfix]
-		// private static void PatchPlayerAwake(PlayerAvatar __instance) {
-		// 	Instance.avatar = __instance;
-		// }
-
 		[HarmonyPatch(typeof(GameDirector), nameof(GameDirector.OutroStart))]
 		[HarmonyPostfix]
 		private static void PatchGameDirectorOutroStart(GameDirector __instance) {
@@ -90,7 +79,6 @@ public class SonicGun : BaseUnityPlugin {
 				return true;
 			}
 			ValueStorage.tinnitusVolume -= Time.deltaTime/20;
-			// ValueStorage.tinnitusVolume = 0.2f;
 			
 			if (audio == null) {
 				audio = EarSound.PrepareSound(EarSound.tinnitusSound);
@@ -100,7 +88,7 @@ public class SonicGun : BaseUnityPlugin {
 				audio.Play();
 			}
 
-			audio.volume = ValueStorage.tinnitusVolume*0.5f; //ValueStorage.tinnitusVolume;
+			audio.volume = ValueStorage.tinnitusVolume*0.5f;
 
 			float MusicVol = Mathf.Lerp(-80f, 0f, __instance.VolumeCurve.Evaluate( (float)(DataDirector.instance.SettingValueFetch(DataDirector.Setting.MusicVolume) * 0.01f) * (1.2f - ValueStorage.tinnitusVolume)));
 			float SfxVol = Mathf.Lerp(-80f, 0f, __instance.VolumeCurve.Evaluate((float)(DataDirector.instance.SettingValueFetch(DataDirector.Setting.SfxVolume) * 0.01f) * (1.2f - ValueStorage.tinnitusVolume)));
@@ -115,7 +103,7 @@ public class SonicGun : BaseUnityPlugin {
 			return false;
 		}
 		[HarmonyPatch(typeof(ReverbDirector), nameof(ReverbDirector.Update))]
-        [HarmonyPrefix]
+      [HarmonyPrefix]
 		private static bool PatchReverbDirectorUpdate(ReverbDirector __instance) {
 			if (ValueStorage.tinnitusVolume <= 0f) {
 				return true;
