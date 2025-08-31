@@ -11,7 +11,7 @@ using UnityEngine.Audio;
 
 namespace SonicGun;
 
-[BepInPlugin("slenered.SonicGun", "SonicGun", "1.0.3")]
+[BepInPlugin("slenered.SonicGun", "SonicGun", "1.1.0")]
 [BepInDependency(REPOLib.MyPluginInfo.PLUGIN_GUID, BepInDependency.DependencyFlags.HardDependency)]
 public class SonicGun : BaseUnityPlugin {
 	internal static SonicGun Instance { get; set; } = null!;

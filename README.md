@@ -28,3 +28,4 @@ If you discover any issues, please report them to the GitHub repo: https://githu
 1.0.2: Fixed incompatibility with multiplayer. (I'm a dunce.)\
 1.0.21: Unity compilation error. \
 1.0.3: Increased overload battery form 3 -> 5. Changed color of shoot effects.
+1.1.0: Because of a type with the version '1.0.2.1' being '1.0.21'
