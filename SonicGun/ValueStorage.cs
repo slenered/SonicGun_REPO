@@ -10,22 +10,9 @@ public static class ValueStorage {
 		new ConditionalWeakTable<MonoBehaviour, NewValues>();
 
 	public static float tinnitusVolume = 0f;
-	// public static Sound tinnitusSound = new Sound();
-	// public static AudioMixer SoundMixer;
 
 	public static NewValues GetOrCreate(MonoBehaviour instance)
 	{
 		return Data.GetOrCreateValue(instance);
 	}
-
-	// public static NewValues TryGet(MonoBehaviour instance) {
-	// 	if (!Data.TryGetValue(instance, out var value)) {
-	// 		value = GetOrCreate(instance);
-	// 	}
-	// 	return value;
-	// }
-
-	// public static void getAll() {
-	// 	return Data.ToList();
-	// }
 }

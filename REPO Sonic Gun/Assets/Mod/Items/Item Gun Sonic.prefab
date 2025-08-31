@@ -3032,7 +3032,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4471782435039479}
   - component: {fileID: 6597843338431809596}
-  - component: {fileID: 114260588232263651}
   - component: {fileID: 114955322833291301}
   - component: {fileID: 114335736286265859}
   - component: {fileID: 114415689858804721}
@@ -3227,193 +3226,6 @@ MonoBehaviour:
     Source: {fileID: 0}
     Sounds: []
     Type: 0
-    Volume: 0.5
-    VolumeRandom: 0.1
-    Pitch: 1
-    PitchRandom: 0.1
-    SpatialBlend: 1
-    Doppler: 1
-    ReverbMix: 1
-    FalloffMultiplier: 1
-    OffscreenVolume: 1
-    OffscreenFalloff: 1
-    LowPassIgnoreColliders: []
-  onStateIdleStart:
-    m_PersistentCalls:
-      m_Calls: []
-  onStateIdleUpdate:
-    m_PersistentCalls:
-      m_Calls: []
-  onStateIdleFixedUpdate:
-    m_PersistentCalls:
-      m_Calls: []
-  onStateOutOfAmmoStart:
-    m_PersistentCalls:
-      m_Calls: []
-  onStateOutOfAmmoUpdate:
-    m_PersistentCalls:
-      m_Calls: []
-  onStateOutOfAmmoFixedUpdate:
-    m_PersistentCalls:
-      m_Calls: []
-  onStateBuildupStart:
-    m_PersistentCalls:
-      m_Calls: []
-  onStateBuildupUpdate:
-    m_PersistentCalls:
-      m_Calls: []
-  onStateBuildupFixedUpdate:
-    m_PersistentCalls:
-      m_Calls: []
-  onStateShootingStart:
-    m_PersistentCalls:
-      m_Calls: []
-  onStateShootingUpdate:
-    m_PersistentCalls:
-      m_Calls: []
-  onStateShootingFixedUpdate:
-    m_PersistentCalls:
-      m_Calls: []
-  onStateReloadingStart:
-    m_PersistentCalls:
-      m_Calls: []
-  onStateReloadingUpdate:
-    m_PersistentCalls:
-      m_Calls: []
-  onStateReloadingFixedUpdate:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &114260588232263651
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1162195038869813}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: db9b80268c736a445a59bcef8314e907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hasOneShot: 1
-  shootTime: 1
-  hasBuildUp: 0
-  buildUpTime: 1
-  numberOfBullets: 1
-  gunRandomSpread: 1
-  gunRange: 50
-  distanceKeep: 0.8
-  gunRecoilForce: 1
-  cameraShakeMultiplier: 0
-  torqueMultiplier: 1
-  grabStrengthMultiplier: 1
-  shootCooldown: 0.1
-  batteryDrain: 0
-  batteryDrainFullBar: 1
-  batteryDrainFullBars: 0
-  misfirePercentageChange: 0
-  shootLineWidthCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 3
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.08480136
-      value: 0.5893838
-      inSlope: 9.415403
-      outSlope: 9.415403
-      tangentMode: 0
-      weightedMode: 3
-      inWeight: 0.33333334
-      outWeight: 0.09187121
-    - serializedVersion: 3
-      time: 0.27332306
-      value: 0.56772286
-      inSlope: 0.0034858247
-      outSlope: 0.0034858247
-      tangentMode: 0
-      weightedMode: 3
-      inWeight: 0.49513823
-      outWeight: 0.665094
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 3
-      inWeight: 0.33333334
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  grabVerticalOffset: -0.2
-  aimVerticalOffset: -8
-  investigateRadius: 0
-  gunMuzzle: {fileID: 4262980845883503}
-  bulletPrefab: {fileID: 1375180529247852}
-  muzzleFlashPrefab: {fileID: 1240613827024124}
-  gunTrigger: {fileID: 4181341742277166}
-  soundShoot:
-    Source: {fileID: 0}
-    Sounds:
-    - {fileID: 8300000, guid: ffe7303e015f12f47990617eb102ea9a, type: 3}
-    - {fileID: 8300000, guid: 408cbe00ae32cff4dac5ceaa46824ab2, type: 3}
-    - {fileID: 8300000, guid: d7628475afa9ac84db718518efc26d1a, type: 3}
-    Type: 1
-    Volume: 0.6
-    VolumeRandom: 0.1
-    Pitch: 1
-    PitchRandom: 0.1
-    SpatialBlend: 1
-    Doppler: 1
-    ReverbMix: 1
-    FalloffMultiplier: 1
-    OffscreenVolume: 1
-    OffscreenFalloff: 1
-    LowPassIgnoreColliders: []
-  soundShootGlobal:
-    Source: {fileID: 0}
-    Sounds: []
-    Type: 7
-    Volume: 0.729
-    VolumeRandom: 0.1
-    Pitch: 1
-    PitchRandom: 0
-    SpatialBlend: 1
-    Doppler: 1
-    ReverbMix: 1
-    FalloffMultiplier: 1
-    OffscreenVolume: 1
-    OffscreenFalloff: 1
-    LowPassIgnoreColliders: []
-  soundNoAmmoClick:
-    Source: {fileID: 0}
-    Sounds:
-    - {fileID: 8300000, guid: 495bd23b645be2d48954b16fa05442b0, type: 3}
-    Type: 0
-    Volume: 0.185
-    VolumeRandom: 0.1
-    Pitch: 1.2
-    PitchRandom: 0
-    SpatialBlend: 1
-    Doppler: 1
-    ReverbMix: 1
-    FalloffMultiplier: 1
-    OffscreenVolume: 1
-    OffscreenFalloff: 1
-    LowPassIgnoreColliders: []
-  soundHit:
-    Source: {fileID: 0}
-    Sounds: []
-    Type: 1
     Volume: 0.5
     VolumeRandom: 0.1
     Pitch: 1
@@ -3768,7 +3580,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afb04f15e5901934204859739e834259, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  batteryBars: 3
+  batteryBars: 5
   isUnchargable: 0
   batteryTransform: {fileID: 4672137054875333}
   upOffset: 0.5
@@ -4041,10 +3853,10 @@ LineRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 0.4140204, g: 0, b: 0.6698113, a: 0}
-      key1: {r: 0.4140204, g: 0, b: 0.6698113, a: 0.9853294}
-      key2: {r: 1, g: 0, b: 0.63685036, a: 0.93143684}
-      key3: {r: 0, g: 0.36830688, b: 1, a: 0.6901961}
+      key0: {r: 0.7647059, g: 0.6627451, b: 0.03529412, a: 0}
+      key1: {r: 0.8, g: 0.7286538, b: 0.28959998, a: 0.9853294}
+      key2: {r: 1, g: 0.721712, b: 0.4470588, a: 0.93143684}
+      key3: {r: 0.879, g: 0.40388924, b: 0.040569227, a: 0.6901961}
       key4: {r: 0, g: 0, b: 0, a: 0}
       key5: {r: 0, g: 0, b: 0, a: 0}
       key6: {r: 0, g: 0, b: 0, a: 0}
@@ -4237,7 +4049,7 @@ Light:
   serializedVersion: 10
   m_Type: 2
   m_Shape: 0
-  m_Color: {r: 0.9473686, g: 0, b: 1, a: 1}
+  m_Color: {r: 0.7647059, g: 0.6627451, b: 0.03529412, a: 1}
   m_Intensity: 5
   m_Range: 5
   m_SpotAngle: 30
@@ -7387,8 +7199,8 @@ ParticleSystem:
     startColor:
       serializedVersion: 2
       minMaxState: 2
-      minColor: {r: 0.44520146, g: 0.20389818, b: 0.5471698, a: 1}
-      maxColor: {r: 0.5728258, g: 0.4130473, b: 0.735849, a: 1}
+      minColor: {r: 0.589, g: 0.51046664, b: 0.027184613, a: 1}
+      maxColor: {r: 0.7647059, g: 0.6627451, b: 0.03529412, a: 1}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -9728,8 +9540,8 @@ ParticleSystem:
     startColor:
       serializedVersion: 2
       minMaxState: 2
-      minColor: {r: 0.7335075, g: 0.58739763, b: 0.754717, a: 1}
-      maxColor: {r: 0.8641599, g: 0.66042185, b: 0.9150943, a: 1}
+      minColor: {r: 0.56700003, g: 0.49140003, b: 0.026169231, a: 1}
+      maxColor: {r: 0.7647059, g: 0.6627451, b: 0.03529412, a: 1}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -14784,7 +14596,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4888921296230499
 Transform:
   m_ObjectHideFlags: 0
@@ -14882,7 +14694,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 1, g: 0.4198113, b: 0.7019424, a: 1}
+      maxColor: {r: 0.894, g: 0.7748, b: 0.041261535, a: 1}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -17952,8 +17764,8 @@ ParticleSystem:
     startColor:
       serializedVersion: 2
       minMaxState: 2
-      minColor: {r: 0.5946468, g: 0.49550554, b: 0.8018868, a: 1}
-      maxColor: {r: 0.56818724, g: 0.2999733, b: 0.5943396, a: 1}
+      minColor: {r: 0.482, g: 0.41773334, b: 0.022246152, a: 1}
+      maxColor: {r: 0.764151, g: 0.66012394, b: 0.032440357, a: 1}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -23360,7 +23172,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 1, g: 0.4198113, b: 0.7019424, a: 1}
+      maxColor: {r: 0.865, g: 0.7496667, b: 0.039923076, a: 1}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -25812,7 +25624,7 @@ Light:
   serializedVersion: 10
   m_Type: 2
   m_Shape: 0
-  m_Color: {r: 0.757611, g: 0.43654326, b: 0.8490566, a: 1}
+  m_Color: {r: 0.7647059, g: 0.6627451, b: 0.03529412, a: 1}
   m_Intensity: 3
   m_Range: 3
   m_SpotAngle: 30

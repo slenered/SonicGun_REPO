@@ -20,4 +20,11 @@ An overloaded device may:
 *As long as you don't overload the device
 
 ***
-If you discover any issues, please report them to the [GitHub repo](https://github.com/slenered/SonicGun_REPO).
+If you discover any issues, please report them to the GitHub repo: https://github.com/slenered/SonicGun_REPO.
+***
+### Changelog:
+1.0.0: Released.\
+1.0.1: Fixed gun not shooting when the battery was empty.\
+1.0.2: Fixed incompatibility with multiplayer. (I'm a dunce.)\
+1.0.21: Unity compilation error. \
+1.0.3: Increased overload battery form 3 -> 5. Changed color of shoot effects.
