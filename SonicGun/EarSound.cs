@@ -3,24 +3,24 @@ using UnityEngine;
 namespace SonicGun;
 
 public class EarSound {
-	private static GameObject audioObject;
-	private static AudioSource source;
-	public static AudioClip tinnitusSound;
+	private static GameObject? _audioObject;
+	private static AudioSource? _source;
+	public static AudioClip? TinnitusSound;
 	
 	
 	public static AudioSource PrepareSound(AudioClip clip) {
-		if (audioObject == null) {
-			audioObject = new GameObject("AudioSource");
-			Object.DontDestroyOnLoad(audioObject);
+		if (_audioObject == null) {
+			_audioObject = new GameObject("AudioSource");
+			Object.DontDestroyOnLoad(_audioObject);
 			
-			source = audioObject.AddComponent<AudioSource>();
-			source.spatialBlend = 0f;
-			source.loop = false;
-			source.playOnAwake = false;
-			source.volume = 0f;
+			_source = _audioObject.AddComponent<AudioSource>();
+			_source.spatialBlend = 0f;
+			_source.loop = false;
+			_source.playOnAwake = false;
+			_source.volume = 0f;
 		}
 		
-		source.clip = clip;
-		return source;
+		_source!.clip = clip;
+		return _source;
 	} 
 }

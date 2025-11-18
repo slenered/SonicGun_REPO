@@ -598,7 +598,7 @@ public class SonicCollider : MonoBehaviour
 						{
 							rhs = -_player.transform.forward;
 						}
-						Vector3 torque = Vector3.Cross((_player.localCameraPosition - center).normalized, rhs) * playerTumbleTorque;
+						Vector3 torque = Vector3.Cross((_player.localCamera.transform.position - center).normalized, rhs) * playerTumbleTorque;
 						_player.tumble.TumbleTorque(torque);
 					}
 				}
@@ -648,7 +648,7 @@ public class SonicCollider : MonoBehaviour
 				{
 					if (!SemiFunc.IsMultiplayer())
 					{
-						item.ReleaseObjectRPC(physGrabEnded: true, 2f);
+						item.ReleaseObjectRPC(physGrabEnded: true, 2f, -1);
 						continue;
 					}
 					item.photonView.RPC("ReleaseObjectRPC", RpcTarget.All, false, 1f);
@@ -750,13 +750,13 @@ public class SonicCollider : MonoBehaviour
 			Gizmos.DrawRay(vector, vector4);
 			Gizmos.DrawRay(vector, vector5);
 			Gizmos.DrawRay(vector, vector6);
-			Gizmos.DrawLineStrip(new Vector3[4]
-			{
-				vector + vector3,
-				vector + vector5,
-				vector + vector4,
-				vector + vector6
-			}, looped: true);
+			// Gizmos.DrawLineStrip(new Vector3[4]
+			// {
+			// 	vector + vector3,
+			// 	vector + vector5,
+			// 	vector + vector4,
+			// 	vector + vector6
+			// }, looped: true);
 		}
 		else if (hitSpread > 180f)
 		{

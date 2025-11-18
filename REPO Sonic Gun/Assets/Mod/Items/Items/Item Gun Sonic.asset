@@ -13,16 +13,17 @@ MonoBehaviour:
   m_Name: Item Gun Sonic
   m_EditorClassIdentifier: 
   disabled: 0
-  itemAssetName: Item Gun Sonic
   itemName: Sonic Gun
   description: test
   itemType: 9
   emojiIcon: 25
   itemVolume: 0
   itemSecretShopType: 0
-  colorPreset: {fileID: 11400000, guid: 5845b796e8f8a684187b09f8674b6c19, type: 2}
-  prefab: {fileID: 1162195038869813, guid: b31be4fa5b6aaa4b7bc45a6b146856bd, type: 3}
-  value: {fileID: 11400000, guid: 96213ceda21c53b4aaf010ff72825e77, type: 2}
+  colorPreset: {fileID: 11400000, guid: 845ffc2ce7d8a4641815a7718430a9e8, type: 2}
+  prefab:
+    prefabName: 
+    resourcePath: 
+  value: {fileID: 11400000, guid: 8c91ac32f664fd549a65a0fbe5653784, type: 2}
   maxAmount: 1
   maxAmountInShop: 1
   maxPurchase: 0

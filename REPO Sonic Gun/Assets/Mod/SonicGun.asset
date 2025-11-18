@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _name: sonicgun
   _author: slenered
-  _version: 1.1.0
+  _version: 1.3.3
   _description: Adds a weapon to create sound remotely.
   _websiteUrl: https://github.com/slenered/SonicGun_REPO.git
   _dependencies:

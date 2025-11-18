@@ -496,10 +496,7 @@ public class ItemSonicGun : MonoBehaviour
 		}
 		if (physGrabObject.playerGrabbing.Count > 1)
 		{
-			foreach (PhysGrabber item in physGrabObject.playerGrabbing)
-			{
-				item.OverrideGrabRelease();
-			}
+			PlayerAvatar.instance.physGrabber.OverrideGrabRelease(photonView.ViewID);
 		}
 		ItemGunSonicBullet component = Object.Instantiate(bulletPrefab, gunMuzzle.position, gunMuzzle.rotation).GetComponent<ItemGunSonicBullet>();
 		// print(component.ToString());

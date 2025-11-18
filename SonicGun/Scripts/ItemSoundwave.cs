@@ -34,7 +34,7 @@ public class ItemSoundwave : MonoBehaviour
 
 	private void Start() {
 		// Sound.CopySound(tinnitusSound, ValueStorage.tinnitusSound);
-		EarSound.tinnitusSound = this.tinnitusSound;
+		EarSound.TinnitusSound = this.tinnitusSound;
 		
 		// ValueStorage.SoundMixer = SoundMixer;
 		startScale = hypersonic ? base.transform.localScale.x*6 : base.transform.localScale.x;
